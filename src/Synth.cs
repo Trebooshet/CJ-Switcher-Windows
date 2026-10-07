@@ -1,4 +1,4 @@
-\xEF\xBB\xBFusing System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace CJSwitcher

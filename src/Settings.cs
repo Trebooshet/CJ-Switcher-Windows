@@ -1,4 +1,4 @@
-\xEF\xBB\xBFusing System;
+using System;
 using Microsoft.Win32;
 
 namespace CJSwitcher

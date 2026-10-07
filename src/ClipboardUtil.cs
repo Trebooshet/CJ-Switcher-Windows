@@ -1,4 +1,4 @@
-\xEF\xBB\xBFusing System;
+using System;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
