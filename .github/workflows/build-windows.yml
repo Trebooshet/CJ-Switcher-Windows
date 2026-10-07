@@ -1,0 +1,42 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check dictionaries
+        shell: pwsh
+        run: |
+          foreach ($f in 'Dictionaries/en.txt', 'Dictionaries/ru.txt') {
+            if (-not (Test-Path $f)) {
+              Write-Error "Нет файла $f. Положите en.txt и ru.txt в папку Dictionaries."
+              exit 1
+            }
+          }
+
+      - name: Build
+        run: dotnet build CJSwitcher.csproj -c Release
+
+      - name: Self test
+        shell: pwsh
+        run: |
+          $exe = "bin/Release/net472/CJ-Switcher.exe"
+          $p = Start-Process -FilePath $exe -ArgumentList "--selftest", "--quiet" -Wait -PassThru
+          Get-Content "$env:TEMP/cj-switcher-selftest.txt"
+          if ($p.ExitCode -ne 0) { exit 1 }
+
+      - name: Show size
+        shell: pwsh
+        run: Get-Item "bin/Release/net472/CJ-Switcher.exe" | Select-Object Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CJ-Switcher-Windows
+          path: bin/Release/net472/CJ-Switcher.exe

@@ -1,0 +1,19 @@
+CJ-Switcher - сторонние материалы / Third-party notices
+
+Программный код CJ-Switcher написан автором и не использует сторонних библиотек: только системные фреймворки macOS.
+The CJ-Switcher source code is written by the author and uses no third-party libraries, only macOS system frameworks.
+
+Словари слов (en.txt, ru.txt) / Word frequency lists (en.txt, ru.txt)
+
+Списки основаны на проекте FrequencyWords (Hermit Dave), https://github.com/hermitdave/FrequencyWords,
+построенном на корпусе субтитров OpenSubtitles (P. Lison, J. Tiedemann, "OpenSubtitles2016: Extracting Large Parallel Corpora from Movie and TV Subtitles", LREC 2016;
+P. Lison, J. Tiedemann, M. Kouylekov, "OpenSubtitles2018: Statistical Rescoring of Sentence Alignments in Large, Noisy Parallel Corpora", LREC 2018; https://opus.nlpl.eu/).
+Содержимое списков распространяется по лицензии Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa/4.0/
+Файлы en.txt и ru.txt, входящие в приложение, остаются под той же лицензией CC BY-SA 4.0.
+Изменения: слова приведены к нижнему регистру, списки используются как частотный словарь для определения раскладки.
+
+The lists are based on FrequencyWords by Hermit Dave, https://github.com/hermitdave/FrequencyWords, built from the OpenSubtitles corpus
+(Lison and Tiedemann, LREC 2016; Lison, Tiedemann and Kouylekov, LREC 2018; https://opus.nlpl.eu/).
+The list content is licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+The files en.txt and ru.txt included in the app remain under the same CC BY-SA 4.0 license.
+Changes: words are lowercased; the lists are used as a frequency dictionary to detect the keyboard layout.

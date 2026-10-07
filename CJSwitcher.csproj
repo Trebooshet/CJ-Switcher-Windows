@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>CJ-Switcher</AssemblyName>
+    <RootNamespace>CJSwitcher</RootNamespace>
+    <Version>2.0.0</Version>
+    <Product>CJ-Switcher</Product>
+    <Description>Исправляет слова, набранные в неправильной раскладке (EN/RU)</Description>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Dictionaries\en.txt" LogicalName="Dictionaries.en.txt" />
+    <EmbeddedResource Include="Dictionaries\ru.txt" LogicalName="Dictionaries.ru.txt" />
+    <EmbeddedResource Include="Resources\icon.ico" LogicalName="icon.ico" />
+    <EmbeddedResource Include="Resources\THIRD_PARTY_NOTICES.txt" LogicalName="THIRD_PARTY_NOTICES.txt" />
+  </ItemGroup>
+
+</Project>
