@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -30,7 +30,7 @@ namespace CJSwitcher
             corrector = new Corrector(hook, customWords, detector, toast);
 
             hook.AutoCorrect = Settings.AutoCorrect;
-            hook.WordTyped += corrector.HandleWord;
+            hook.WordHandler = corrector.TryHandleWord;
             hook.HotkeyPressed += OnHotkey;
 
             statusItem.Enabled = false;

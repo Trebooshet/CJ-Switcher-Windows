@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace CJSwitcher
@@ -20,6 +20,7 @@ namespace CJSwitcher
 
         public const uint INPUT_KEYBOARD = 1;
         public const uint KEYEVENTF_KEYUP = 0x0002;
+        public const uint KEYEVENTF_UNICODE = 0x0004;
 
         public const int VK_BACK = 0x08;
         public const int VK_TAB = 0x09;

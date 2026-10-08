@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,58 +26,33 @@ namespace CJSwitcher
 
         // ---------- Автозамена ----------
 
-        public async void HandleWord(string keys)
+        /// <summary>
+        /// Вызывается в хуке при нажатии пробела после слова. Возвращает true, если слово исправлено:
+        /// тогда стёрто слово, напечатано исправление и поставлен пробел (одним пакетом),
+        /// а настоящий пробел скрыт от приложения.
+        /// </summary>
+        public bool TryHandleWord(string keys)
         {
             try
             {
-                if (busy) return;
+                if (busy) return false;
 
                 KeyLayout? layout = InputSource.CurrentLayout();
-                if (layout == null) return;
+                if (layout == null) return false;
 
                 Fix fix = detector.Detect(keys, layout.Value);
-                if (fix == null) return;
-                if (FrontApp.IsExcluded()) return;
+                if (fix == null) return false;
+                if (FrontApp.IsExcluded()) return false;
 
-                busy = true;
-                try
-                {
-                    await ReplaceWord(keys.Length + 1, fix.Text + " ", fix.Layout);
-                }
-                finally
-                {
-                    busy = false;
-                }
+                Synth.TypeReplacement(keys.Length, fix.Text, true);
+                // Переключение раскладки уходит в окно раньше следующих нажатий пользователя.
+                InputSource.Select(fix.Layout);
+                return true;
             }
             catch (Exception ex)
             {
                 Log.Write("Автозамена: " + ex);
-            }
-        }
-
-        private async Task ReplaceWord(int deleteCount, string text, KeyLayout target)
-        {
-            hook.Paused = true;
-            ClipboardSnapshot snapshot = ClipboardSnapshot.Take();
-            try
-            {
-                for (int i = 0; i < deleteCount; i++)
-                {
-                    Synth.Tap(Native.VK_BACK);
-                    await Task.Delay(3);
-                }
-
-                ClipboardUtil.SetText(text);
-                Synth.Chord(Native.VK_CONTROL, Native.VK_V);
-                await Task.Delay(150);
-
-                InputSource.Select(target);
-                snapshot.Restore();
-                await Task.Delay(100);
-            }
-            finally
-            {
-                hook.Paused = false;
+                return false;
             }
         }
 
@@ -118,10 +93,8 @@ namespace CJSwitcher
                         history.Add(new KeyValuePair<KeyLayout, string>(target, word));
                     }
 
-                    ClipboardUtil.SetText(converted);
-                    Synth.Chord(Native.VK_CONTROL, Native.VK_V);
-                    await Task.Delay(150);
-
+                    // Выделенный текст заменяется печатью (без вставки из буфера).
+                    Synth.TypeText(converted);
                     InputSource.Select(target);
                 }
                 finally

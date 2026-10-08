@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -62,11 +62,17 @@ namespace CJSwitcher
         private IntPtr keyboardHook = IntPtr.Zero;
         private IntPtr mouseHook = IntPtr.Zero;
         private int heldHotkeyScan;
+        private bool swallowedSpace;
 
         public bool AutoCorrect = true;
         public bool Paused;
 
-        public event Action<string> WordTyped;
+        /// <summary>
+        /// Вызывается прямо в хуке, когда нажат пробел после слова. Если вернуть true, исправление уже
+        /// отправлено (вместе с пробелом), а настоящий пробел скрывается от приложения.
+        /// </summary>
+        public Func<string, bool> WordHandler;
+
         public event Action<Hotkey> HotkeyPressed;
 
         public KeyboardHook(SynchronizationContext sync)
@@ -161,6 +167,11 @@ namespace CJSwitcher
         private bool OnKeyUp(Native.KBDLLHOOKSTRUCT info)
         {
             int scan = (int)info.scanCode;
+            if (swallowedSpace && info.vkCode == Native.VK_SPACE)
+            {
+                swallowedSpace = false;
+                return true;
+            }
             if (heldHotkeyScan != 0 && scan == heldHotkeyScan)
             {
                 heldHotkeyScan = 0;
@@ -182,6 +193,13 @@ namespace CJSwitcher
             bool win = IsDown(Native.VK_LWIN) || IsDown(Native.VK_RWIN);
 
             if (heldHotkeyScan != 0 && !(ctrl && alt)) heldHotkeyScan = 0;
+
+            // Пробел, который мы уже «съели»: повторы при удержании тоже скрываем.
+            if (swallowedSpace && vk == Native.VK_SPACE)
+            {
+                if (IsDown(Native.VK_SPACE)) return true;
+                swallowedSpace = false;
+            }
 
             // Ctrl+Alt+D и Ctrl+Alt+Z работают всегда.
             if (ctrl && alt && !shift && !win && !extended && (scan == ScanD || scan == ScanZ))
@@ -215,12 +233,25 @@ namespace CJSwitcher
 
             if (vk == Native.VK_SPACE)
             {
-                if (buffer.Length > 0)
-                {
-                    string word = buffer.ToString();
-                    sync.Post(delegate { RaiseWord(word); }, null);
-                }
+                string word = buffer.ToString();
                 buffer.Clear();
+                if (word.Length > 0 && WordHandler != null)
+                {
+                    bool handled = false;
+                    try
+                    {
+                        handled = WordHandler(word);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write("Обработка слова: " + ex);
+                    }
+                    if (handled)
+                    {
+                        swallowedSpace = true;
+                        return true;
+                    }
+                }
             }
             else if (vk == Native.VK_BACK)
             {
@@ -248,12 +279,6 @@ namespace CJSwitcher
                 }
             }
             return false;
-        }
-
-        private void RaiseWord(string word)
-        {
-            Action<string> handler = WordTyped;
-            if (handler != null) handler(word);
         }
 
         private void RaiseHotkey(Hotkey hotkey)
